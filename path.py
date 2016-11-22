@@ -80,7 +80,7 @@ class path:
 
     def naiveInsertAux(self, v, key, position):
         v.setSize(v.getSize() + 1)
-        leftSize = p.getNodeSize(v.getLeft(reverse))
+        leftSize = self.getNodeSize(v.getLeft(reverse))
 
         if leftSize == 0 and position <= 1:
             v.setLeft(pathNode(None, key, None, 1, v), reverse)  # insert leaf
@@ -88,7 +88,7 @@ class path:
         # Note resemblance of the strategy to that of 'RandomizedSelect':
         elif position <= leftSize + 1:  # if position is in left subtree
             self.naiveInsertAux(v.getLeft(reverse), key, position)
-        elif p.getNodeSize(v.getRight(reverse)) == 0 and position > leftSize + 1:
+        elif self.getNodeSize(v.getRight(reverse)) == 0 and position > leftSize + 1:
             v.setRight(pathNode(None, key, None, 1, v), reverse)
         else:
             self.naiveInsertAux(v.getRight(reverse), key, position - (leftSize + 1))
@@ -173,7 +173,7 @@ class path:
 
         # No Grandparent
         if (x.getParent() == self.root):
-            self.rotate(x.getParent, x)
+            self.rotate(x.getParent(), x)
             return
 
         # Get grandparent and parent
@@ -183,10 +183,10 @@ class path:
         xisleftchild = False
         parentisleftchild = False
 
-        if (parent.getLeft() == x):
+        if (parent.getLeft(reverse) == x):
             xisleftchild = True
 
-        if (grandparent.getLeft() == parent):
+        if (grandparent.getLeft(reverse) == parent):
             parentisleftchild = True
 
         # All left child or all right child
@@ -248,11 +248,11 @@ class path:
 
 
 if __name__ == '__main__':
-    p = path()
-    p.naiveInsert(10, 1)
-    p.naiveInsert(7, 1)
-    p.naiveInsert(3, 1)
-    p.naiveInsert(15, 4)
+    # p = path()
+    # p.naiveInsert(10, 1)
+    # p.naiveInsert(7, 1)
+    # p.naiveInsert(3, 1)
+    # p.naiveInsert(15, 4)
     # p.naiveInsert(105, 5)
     # p.naiveInsert(103, 5)
     # p.naiveInsert(107, 7)
@@ -260,3 +260,25 @@ if __name__ == '__main__':
     # p.naiveInsert(8, 4)
     # p.naiveInsert(2, 1)
     # p.naiveInsert(12, 7)
+
+    # Check splay on Fig 4.10
+    p2 = path()
+    p2.naiveInsert(9,1)
+    p2.naiveInsert(20, 2)
+    p2.naiveInsert(8, 1)
+    p2.naiveInsert(19, 2)
+    p2.naiveInsert(7, 1)
+    p2.naiveInsert(18, 2)
+    p2.naiveInsert(6, 1)
+    p2.naiveInsert(11, 1)
+    p2.naiveInsert(5, 3)
+    p2.naiveInsert(17, 4)
+    p2.naiveInsert(4, 3)
+    p2.naiveInsert(12, 3)
+    p2.naiveInsert(3, 5)
+    p2.naiveInsert(13, 5)
+    p2.naiveInsert(2, 7)
+    p2.naiveInsert(14, 7)
+    p2.naiveInsert(1, 9)
+    p2.naiveInsert(15, 9)
+    p2.naiveInsert(16, 11)
