@@ -241,7 +241,7 @@ class path:
         res = self.findNode(position)
         if res != None:
             self.splay(res)
-        return res
+        return res.getKey()
 
     def assign(self, position, key):
         res = self.findNode(position)
@@ -259,7 +259,9 @@ class path:
         deletion_node = self.findNode(position)
         if deletion_node != None:
             self.n = self.n - 1
-            self.delete_aux(deletion_node)
+            return self.delete_aux(deletion_node)
+        else:
+            return None
 
 
     def delete_aux(self, deletion_node):
@@ -287,6 +289,7 @@ class path:
                 self.reduce_parents_size_by_one(deletion_node)
                 # Splay at the parent
                 self.splay(parent)
+            return deletion_node.getKey()
         elif (deletion_node.getRight(reverse) == None):
             # Left child not None, Right child None
             if (deletion_node.getParent() == None):
@@ -307,6 +310,7 @@ class path:
                 self.reduce_parents_size_by_one(parent)
                 # Splay at parent
                 self.splay(parent)
+            return deletion_node.getKey()
         else:
             # Have both children, need to exchange with preceding node, then do deletion
             target = deletion_node.getLeft(reverse)
@@ -320,15 +324,54 @@ class path:
             target.setKey(temp)
 
             # Delete at target
-            self.delete_aux(target)
+            return self.delete_aux(target)
 
 
 
     def split(self, position):
-        pass  # replace this
+        # First find the node for split
+        v = self.findNode(position)
+        if (v == None):
+            return None
+        # Splay v to the root
+        self.splay(v)
+        # v should be at root, chop off the right child
+        rightchild = v.getRight(reverse)
+        v.setRight(None, reverse)
+        v.setSize(v.getSize() - self.getNodeSize(rightchild))
+        self.n = self.n - self.getNodeSize(rightchild)
+        # Create a new path using the right child
+        q = path()
+        q.n = self.getNodeSize(rightchild)
+        q.root = rightchild
+        if (rightchild != None):
+            rightchild.setParent(None)
+        return q
+
 
     def append(self, p2):
-        pass  # replace this
+        # p2 empty, no change
+        if (p2 == None) or (p2.n == 0):
+            return
+        # self empty, p2 not, set self = p2
+        if (self == None) or (self.n == 0):
+            self.n = p2.n
+            self.root = p2.root
+            return
+        # First splay the rightmost element to the root
+        rightmost = self.findNode(self.n)
+        self.splay(rightmost)
+        # attach p2 to the right child of rightmost
+        rightmost.setRight(p2.root, reverse)
+        self.n += p2.n
+        rightmost.setSize(self.n)
+        # set the parent of root of p2 to rightmost
+        p2.root.setParent(rightmost)
+        # set p2 to empty
+        # p2.root = None
+        # p2.n = 0
+        return
+
 
     def getNodeSize(self, v):
         if v == None:
@@ -338,18 +381,18 @@ class path:
 
 
 if __name__ == '__main__':
-    # p = path()
-    # p.naiveInsert(10, 1)
-    # p.naiveInsert(7, 1)
-    # p.naiveInsert(3, 1)
-    # p.naiveInsert(15, 4)
-    # p.naiveInsert(105, 5)
-    # p.naiveInsert(103, 5)
-    # p.naiveInsert(107, 7)
-    # p.naiveInsert(4, 2)
-    # p.naiveInsert(8, 4)
-    # p.naiveInsert(2, 1)
-    # p.naiveInsert(12, 7)
+    p = path()
+    p.naiveInsert(10, 1)
+    p.naiveInsert(7, 1)
+    p.naiveInsert(3, 1)
+    p.naiveInsert(15, 4)
+    p.naiveInsert(105, 5)
+    p.naiveInsert(103, 5)
+    p.naiveInsert(107, 7)
+    p.naiveInsert(4, 2)
+    p.naiveInsert(8, 4)
+    p.naiveInsert(2, 1)
+    p.naiveInsert(12, 7)
 
     # Check splay on Fig 4.10
     p2 = path()
@@ -374,6 +417,6 @@ if __name__ == '__main__':
     p2.naiveInsert(16, 11)
     print p2.tree()
     print p2
-    p2.delete(2)
+    p2.delete(14)
     print p2.tree()
     print p2
