@@ -147,15 +147,9 @@ class path:
         child.setRight(parent, rev)
 
         # Change the size label of child and parent
-        ASize = 0
-        if (A != None):
-            ASize = A.getSize()
-        BSize = 0
-        if (B != None):
-            BSize = B.getSize()
-        CSize = 0
-        if (C != None):
-            CSize = C.getSize()
+        ASize = self.getNodeSize(A)
+        BSize = self.getNodeSize(B)
+        CSize = self.getNodeSize(C)
         parent.setSize(BSize + CSize + 1)
         child.setSize(ASize + parent.getSize() + 1)
 
@@ -222,7 +216,8 @@ class path:
 
     # insert key at given position in subtree rooted at v, then splay
     def insertAux(self, v, key, position):
-        pass  #
+        #v.setSize(v.getSize() + 1)
+        pass
 
     # return the value at the given position
     def get(self, position):
