@@ -216,15 +216,38 @@ class path:
 
     # insert key at given position in subtree rooted at v, then splay
     def insertAux(self, v, key, position):
-        #v.setSize(v.getSize() + 1)
-        pass
+        v.setSize(v.getSize() + 1)
+        leftSize = self.getNodeSize(v.getLeft(reverse))
+        rightSize = self.getNodeSize(v.getRight(reverse))
+
+        if leftSize == 0 and position <= 1:
+            v.setLeft(pathNode(None, key, None, 1, v), reverse)
+            # Then splay
+            self.splay(v.getLeft(reverse))
+        elif position <= (leftSize + 1):
+            # Insert at left subtree
+            self.insertAux(v.getLeft(reverse), key, position)
+        elif rightSize == 0 and position > (leftSize + 1):
+            v.setRight(pathNode(None, key, None, 1, v), reverse)
+            # Then splay
+            self.splay(v.getRight(reverse))
+        else:
+            # Insert at right subtree
+            self.insertAux(v.getRight(reverse), key, position - leftSize - 1)
+
 
     # return the value at the given position
     def get(self, position):
-        return 0  # replace this
+        res = self.findNode(position)
+        if res != None:
+            self.splay(res)
+        return res
 
     def assign(self, position, key):
-        pass  # replace this
+        res = self.findNode(position)
+        if res != None:
+            res.setKey(key)
+            self.splay(res)
 
     def delete(self, position):
         pass  # replace this
