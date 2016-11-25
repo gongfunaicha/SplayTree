@@ -249,8 +249,80 @@ class path:
             res.setKey(key)
             self.splay(res)
 
+    def reduce_parents_size_by_one(self, v):
+        while (v.getParent() != None):
+            v = v.getParent()
+            v.setSize(v.getSize() - 1)
+
     def delete(self, position):
-        pass  # replace this
+        # First find the node for deletion
+        deletion_node = self.findNode(position)
+        if deletion_node != None:
+            self.n = self.n - 1
+            self.delete_aux(deletion_node)
+
+
+    def delete_aux(self, deletion_node):
+        if (deletion_node.getLeft(reverse) == None):
+            # Does not have left child, directly remove the node
+            if (deletion_node.getParent() == None):
+                # If the node for deletion is root, then assign the root to his right child
+                self.root = deletion_node.getRight(reverse)
+                # Set right child's parent to be None if right child is not none
+                if (deletion_node.getRight(reverse) != None):
+                    deletion_node.getRight(reverse).setParent(None)
+            else:
+                # Node for deletion is not root, assign the child to the parent and parent to the child
+                parent = deletion_node.getParent()
+                if (parent.getLeft(reverse) == deletion_node):
+                    # If the deletion node is the left node
+                    parent.setLeft(deletion_node.getRight(reverse), reverse)
+                else:
+                    # Right node
+                    parent.setRight(deletion_node.getRight(reverse), reverse)
+                # Set right child's parent to the parent, if not None
+                if (deletion_node.getRight(reverse) != None):
+                    deletion_node.getRight(reverse).setParent(parent)
+                # Reduce parent size by one
+                self.reduce_parents_size_by_one(deletion_node)
+                # Splay at the parent
+                self.splay(parent)
+        elif (deletion_node.getRight(reverse) == None):
+            # Left child not None, Right child None
+            if (deletion_node.getParent() == None):
+                # Node for deletion is root, assign root to left child, then change the parent of left child to None
+                self.root = deletion_node.getLeft(reverse)
+                deletion_node.getLeft(reverse).setParent(None)
+            else:
+                # Not root, assign parent pointer to left child and assign left child parent to parent
+                parent = deletion_node.getParent()
+                if (parent.getLeft(reverse) == deletion_node):
+                    # If the deletion node is the left node
+                    parent.setLeft(deletion_node.getLeft(reverse), reverse)
+                else:
+                    # Right node
+                    parent.setRight(deletion_node.getLeft(reverse), reverse)
+                deletion_node.getLeft(reverse).setParent(parent)
+                # Reduce parent size by one
+                self.reduce_parents_size_by_one(parent)
+                # Splay at parent
+                self.splay(parent)
+        else:
+            # Have both children, need to exchange with preceding node, then do deletion
+            target = deletion_node.getLeft(reverse)
+            # Find the rightmost child of the left subtree
+            while (target.getRight(reverse) != None):
+                target = target.getRight(reverse)
+
+            # Exchange the value between deletion_node and target
+            temp = deletion_node.getKey()
+            deletion_node.setKey(target.getKey())
+            target.setKey(temp)
+
+            # Delete at target
+            self.delete_aux(target)
+
+
 
     def split(self, position):
         pass  # replace this
@@ -300,3 +372,8 @@ if __name__ == '__main__':
     p2.naiveInsert(1, 9)
     p2.naiveInsert(15, 9)
     p2.naiveInsert(16, 11)
+    print p2.tree()
+    print p2
+    p2.delete(2)
+    print p2.tree()
+    print p2
